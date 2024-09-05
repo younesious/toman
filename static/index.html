@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number to Persian Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            font-size: 1rem;
+            padding: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+        #result {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Number to Persian Converter</h1>
+        <input type="text" id="numberInput" placeholder="Enter a number (max 10 digits)" maxlength="14">
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const numberInput = document.getElementById('numberInput');
+        const result = document.getElementById('result');
+
+        numberInput.addEventListener('input', function(e) {
+            const value = e.target.value;
+
+            // Remove non-digit characters
+            const cleaned = value.replace(/\D/g, '');
+
+            // Format with commas
+            const formatted = cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ', ');
+
+            // Update input value
+            e.target.value = formatted;
+
+            if (cleaned.length > 0 && cleaned.length <= 10) {
+                convertToPersian(cleaned);
+            } else {
+                result.textContent = '';
+            }
+        });
+
+        function convertToPersian(number) {
+            fetch('/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ number: number }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                result.textContent = data.words;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                result.textContent = 'An error occurred';
+            });
+        }
+    </script>
+</body>
+</html>
